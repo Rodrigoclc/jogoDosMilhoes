@@ -1,0 +1,21 @@
+<div style=" background: rgb(0,172,148);
+background: linear-gradient(117deg, rgba(0,172,148,1) 0%, rgba(75,40,224,1) 100%); width: 100vw;height: 100vh;" class="p-2">
+    @if (!loading) {
+        <!-- <h1>{{ question.header }}</h1> -->
+        <div style=" border-radius: 10px;background: rgb(172,21,0);cursor: pointer;background: linear-gradient(117deg, rgba(172,21,0,1) 0%, rgba(193,92,92,1) 100%); "
+            class="text-white m-2 border border-white border-3 p-2">{{ question.round_question }}
+        </div>
+        @for (item of question.alternatives; track $index) {
+            <div (click)="SubmitToolOutputsToRun(item)" style=" background: rgb(172,21,0);cursor: pointer;
+            background: linear-gradient(117deg, rgba(172,21,0,1) 0%, rgba(193,92,92,1) 100%); "
+                class="d-flex mb-2 justify-content-start rounded-pill border border-3 border-white">
+                <div style="width: 50px; height: 50px;" class="rounded-circle bg-white text-primary ">
+                    <p class="fs-1 d-flex justify-content-center align-items-center text-uppercase">{{ item.split(')')[0] }}</p>
+                </div>
+                <div class="text-white ms-2 d-flex align-items-center">
+                    {{ item.split('=')[1] }}
+                </div>
+            </div>
+        }
+    }
+</div>
