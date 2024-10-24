@@ -1,18 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { OpenAiService } from '../../services/open-ai.service';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2'
 
 interface Question {
   header: string,
   round_question: string,
-  alternatives: string[]
+  alternatives: string[],
+  values: string,
+  correct_alternative: string
 }
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    FormsModule
+    FormsModule,
+    CommonModule
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
@@ -27,6 +32,8 @@ export class HomeComponent implements OnInit {
   response: string = '';
   question!: Question;
   loading: boolean = true;
+  selected: boolean = false;
+  itemSelected: number = -1;
 
   constructor(private openAi: OpenAiService) { }
 
@@ -45,6 +52,42 @@ export class HomeComponent implements OnInit {
       });
   }
 
+  selectAlternative(response: string, index: number) {
+    this.itemSelected = index;
+    this.selected = true;
+    
+    setTimeout(async () => {
+      await Swal.fire({
+        title: "Deseja Confirmar?",
+        text: "É por sua conta e risco!",
+        icon: "question",
+        showCancelButton: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          console.log('confirmado');
+          if(response == this.question.correct_alternative) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: "Muito bem você acertou!",
+              showConfirmButton: false,
+              timer: 3500
+            });
+            this.SubmitToolOutputsToRun(response)
+          } else {
+            Swal.fire({
+              position: "center",
+              icon: "error",
+              title: "Que pena você errou!",
+              showConfirmButton: false,
+              timer: 3500
+            });
+          }
+        }
+      });;
+    }, 1000);    
+  }
+
   createThread() {
     console.log('createThread');
     this.openAi.createThread(this.theme)
@@ -57,7 +100,7 @@ export class HomeComponent implements OnInit {
 
   listRuns() {
     console.log('listRuns');
-    this.loading = true;
+    
     this.openAi.listRuns(this.threadId)
       .subscribe(response => {
         console.log(response);
@@ -68,6 +111,7 @@ export class HomeComponent implements OnInit {
           console.log(this.question.header);
           console.log(this.question.round_question);
           console.log(this.question.alternatives);
+          console.log(this.question.correct_alternative);
           this.loading = false;
         } catch (error) {
           console.log('falhou');
@@ -79,6 +123,7 @@ export class HomeComponent implements OnInit {
   }
 
   SubmitToolOutputsToRun(response: string) {
+    this.loading = true;
     console.log('SubmitToolOutputsToRun');
     this.openAi.SubmitToolOutputsToRun(this.threadId, this.runId, this.toolCallId, response)
       .subscribe(response => {
