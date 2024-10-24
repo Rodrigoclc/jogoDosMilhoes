@@ -73,7 +73,8 @@ export class HomeComponent implements OnInit {
               showConfirmButton: false,
               timer: 3500
             });
-            this.SubmitToolOutputsToRun(response)
+            this.SubmitToolOutputsToRun(response);
+            this.itemSelected = -1;
           } else {
             Swal.fire({
               position: "center",
@@ -85,7 +86,8 @@ export class HomeComponent implements OnInit {
           }
         }
       });;
-    }, 1000);    
+    }, 1000);
+    
   }
 
   createThread() {
